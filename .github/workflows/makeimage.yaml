@@ -57,7 +57,7 @@ jobs:
                 push: true
                 build-args: |
                     S6_OVERLAY_VERSION=${{ env.S6V }}
-                    ELABFTW_VERSION="${{ env.ELAB_BRANCH }}
+                    ELABFTW_VERSION=${{ env.ELAB_BRANCH }}
                     ARCHITECTURE=amd64
                 tags: |
                     ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-amd64
@@ -72,7 +72,7 @@ jobs:
                 push: true
                 build-args: |
                     S6_OVERLAY_VERSION=${{ env.S6V }}
-                    ELABFTW_VERSION="${{ env.ELAB_BRANCH }}
+                    ELABFTW_VERSION=${{ env.ELAB_BRANCH }}
                     ARCHITECTURE=arm
                 tags: |
                     ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-arm32
@@ -87,7 +87,7 @@ jobs:
                 push: true
                 build-args: |
                     S6_OVERLAY_VERSION=${{ env.S6V }}
-                    ELABFTW_VERSION="${{ env.ELAB_BRANCH }}
+                    ELABFTW_VERSION=${{ env.ELAB_BRANCH }}
                     ARCHITECTURE=aarch64
                 tags: |
                     ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-arm64
