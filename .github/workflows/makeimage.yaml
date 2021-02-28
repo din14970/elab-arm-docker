@@ -23,7 +23,7 @@ jobs:
                   LATEST_DATE: ${{ steps.elabftw_version.outputs.latest_tag_published_at }}
                   LATEST_COMMIT: ${{ steps.elabftw_version.outputs.target_commitish }}
               run: |
-                  echo "eLabFTW: Version $LATEST was released $LATEST_DATE and has commit LATEST_COMMIT"
+                  echo "eLabFTW: Version $LATEST was released $LATEST_DATE and has commit $LATEST_COMMIT"
 
             - name: Checkout elabimg repo
               uses: actions/checkout@v2
@@ -51,10 +51,10 @@ jobs:
             # with manual run commands
             - name: Build for AMD64
               env:
-                  AMDTAG: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-amd64
+                  AMDTAG: "${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-amd64"
               run: |
                 echo $AMDTAG
-                echo 'docker build -t $AMDTAG --build-arg ARCH=amd64/ ARCHITECTURE=amd64 ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} S6_OVERLAY_VERSION=$S6V .'
+                echo "Run command: docker build -t $AMDTAG --build-arg ARCH=amd64/ ARCHITECTURE=amd64 ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} S6_OVERLAY_VERSION=$S6V ."
                 docker build -t $AMDTAG --build-arg ARCH=amd64/ ARCHITECTURE=amd64 ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} S6_OVERLAY_VERSION=$S6V .
                 docker push $AMDTAG
             
