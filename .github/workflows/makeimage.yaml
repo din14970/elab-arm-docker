@@ -56,9 +56,9 @@ jobs:
                 platforms: linux/amd64
                 push: true
                 build-args: |
+                    S6_OVERLAY_VERSION="$S6V"
+                    ELABFTW_VERSION="$ELAB_BRANCH"
                     ARCHITECTURE=amd64
-                    ELABFTW_VERSION=${{ ELAB_BRANCH }}
-                    S6_OVERLAY_VERSION=${{ S6V }}
                 tags: |
                     ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-amd64
                     ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ steps.elabftw_version.outputs.latest_tag }}-amd64
