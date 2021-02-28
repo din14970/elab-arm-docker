@@ -51,18 +51,20 @@ jobs:
             # We adapt https://www.docker.com/blog/multi-arch-build-and-images-the-simple-way/
             # with manual run commands
             - name: Build for AMD64
+              env:
+                  ELAB_BRANCH: hypernext
               run: |
-                docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-amd64 --build-arg ARCH=amd64/ --build-arg ARCHITECTURE=amd64 --build-arg ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} --build-arg S6_OVERLAY_VERSION=$S6V -f $DOCKER_FILE .
+                docker buildx build --platform linux/amd64 -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-amd64 --build-arg ARCHITECTURE=amd64 --build-arg ELABFTW_VERSION=${{ hypernext }} --build-arg S6_OVERLAY_VERSION=$S6V -f $DOCKER_FILE .
                 docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-amd64
             
             - name: Build for ARM32V7
               run: |
-                docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-arm32v7 --build-arg ARCH=arm32v7/ --build-arg ARCHITECTURE=arm --build-arg ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} --build-arg S6_OVERLAY_VERSION=$S6V -f $DOCKER_FILE .
+                docker buildx build --platform linux/arm/v7 -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-arm32v7 --build-arg ARCHITECTURE=arm --build-arg ELABFTW_VERSION=${{ hypernext }} --build-arg S6_OVERLAY_VERSION=$S6V -f $DOCKER_FILE .
                 docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-arm32v7
 
             - name: Build for ARM64
               run: |
-                docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-arm64 --build-arg ARCH=arm64v8/ --build-arg ARCHITECTURE=aarch64 --build-arg ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} --build-arg S6_OVERLAY_VERSION=$S6V -f $DOCKER_FILE .
+                docker buildx build --platform linux/arm64/v8 -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-arm64 --build-arg ARCHITECTURE=aarch64 --build-arg ELABFTW_VERSION=${{ hypernext }} --build-arg S6_OVERLAY_VERSION=$S6V -f $DOCKER_FILE .
                 docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-arm32v7
 
             - name: Create and push the manifest file
