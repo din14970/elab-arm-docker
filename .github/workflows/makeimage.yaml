@@ -9,6 +9,7 @@ jobs:
         runs-on: ubuntu-latest
         env:
             S6V: 2.2.0.1
+            DOCKER_FILE: Dockerfile_template
         steps:
             - name: Get latest release commit eLabFTW
               id: elabftw_version
@@ -50,34 +51,24 @@ jobs:
             # We adapt https://www.docker.com/blog/multi-arch-build-and-images-the-simple-way/
             # with manual run commands
             - name: Build for AMD64
-              env:
-                  AMDTAG: "${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-amd64"
               run: |
-                echo $AMDTAG
-                echo "Run command: docker build -t $AMDTAG --build-arg ARCH=amd64/ ARCHITECTURE=amd64 ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} S6_OVERLAY_VERSION=$S6V ."
-                docker build -t $AMDTAG --build-arg ARCH=amd64/ ARCHITECTURE=amd64 ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} S6_OVERLAY_VERSION=$S6V .
-                docker push $AMDTAG
+                docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-amd64 --build-arg ARCH=amd64/ --build-arg ARCHITECTURE=amd64 --build-arg ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} --build-arg S6_OVERLAY_VERSION=$S6V -f $DOCKER_FILE .
+                docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-amd64
             
             - name: Build for ARM32V7
-              env:
-                  ARMTAG: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-arm32v7
               run: |
-                docker build -t $ARMTAG --build-arg ARCH=arm32v7/ ARCHITECTURE=arm ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} S6_OVERLAY_VERSION=$S6V .
-                docker push $ARMTAG
+                docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-arm32v7 --build-arg ARCH=arm32v7/ --build-arg ARCHITECTURE=arm --build-arg ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} --build-arg S6_OVERLAY_VERSION=$S6V -f $DOCKER_FILE .
+                docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-arm32v7
 
             - name: Build for ARM64
-              env:
-                  ARM64TAG: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-arm64
               run: |
-                docker build -t $ARM64TAG --build-arg ARCH=arm64v8/ ARCHITECTURE=aarch64 ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} S6_OVERLAY_VERSION=$S6V .
-                docker push $ARM64TAG
+                docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-arm64 --build-arg ARCH=arm64v8/ --build-arg ARCHITECTURE=aarch64 --build-arg ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} --build-arg S6_OVERLAY_VERSION=$S6V -f $DOCKER_FILE .
+                docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-arm32v7
 
             - name: Create and push the manifest file
-              env:
-                  PUSHTAG: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-latest
               run: |
-                docker manifest create $PUSHTAG --ammend $AMDTAG --ammend $ARMTAG --ammend $ARM64TAG
-                docker manifest push $PUSHTAG
+                docker manifest create ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-latest --ammend ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-amd64 --ammend ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-arm32v7 --ammend ${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-arm64
+                docker manifest push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-latest
 
             # https://github.com/docker/build-push-action#multi-platform-image
             #            - name: Build and push to Docker Hub
