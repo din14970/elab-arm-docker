@@ -25,21 +25,6 @@ jobs:
               run: |
                   echo "eLabFTW: Version $LATEST was released $LATEST_DATE and has commit LATEST_COMMIT"
 
-            - name: Get latest release commit eLabimg
-              id: elabimg_version
-              uses: abatilo/release-info-action@v1.3.0
-              with:
-                  owner: elabftw
-                  repo: elabimg
-
-            - name: Verify release commit elabimg
-              env:
-                  LATEST: ${{ steps.elabimg_version.outputs.latest_tag }}
-                  LATEST_DATE: ${{ steps.elabimg_version.outputs.latest_tag_published_at }}
-                  LATEST_COMMIT: ${{ steps.elabimg_version.outputs.target_commitish }}
-              run: |
-                  echo "eLabIMG: Version $LATEST was released $LATEST_DATE and has commit LATEST_COMMIT"
-
             - name: Checkout elabimg repo
               uses: actions/checkout@v2
               with:
@@ -68,6 +53,8 @@ jobs:
               env:
                   AMDTAG: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-amd64
               run: |
+                echo $AMDTAG
+                echo 'docker build -t $AMDTAG --build-arg ARCH=amd64/ ARCHITECTURE=amd64 ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} S6_OVERLAY_VERSION=$S6V .'
                 docker build -t $AMDTAG --build-arg ARCH=amd64/ ARCHITECTURE=amd64 ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} S6_OVERLAY_VERSION=$S6V .
                 docker push $AMDTAG
             
