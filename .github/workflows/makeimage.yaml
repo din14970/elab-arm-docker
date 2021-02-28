@@ -57,8 +57,8 @@ jobs:
                 push: true
                 build-args: |
                     ARCHITECTURE=amd64
-                    ELABFTW_VERSION=$ELAB_BRANCH
-                    S6_OVERLAY_VERSION=$S6V
+                    ELABFTW_VERSION=${{ ELAB_BRANCH }}
+                    S6_OVERLAY_VERSION=${{ S6V }}
                 tags: |
                     ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-amd64
                     ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ steps.elabftw_version.outputs.latest_tag }}-amd64
@@ -72,8 +72,8 @@ jobs:
                 push: true
                 build-args: |
                     ARCHITECTURE=arm
-                    ELABFTW_VERSION=$ELAB_BRANCH
-                    S6_OVERLAY_VERSION=$S6V
+                    ELABFTW_VERSION=${{ ELAB_BRANCH }}
+                    S6_OVERLAY_VERSION=${{ S6V }}
                 tags: |
                     ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-arm32
                     ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ steps.elabftw_version.outputs.latest_tag }}-arm32
@@ -87,8 +87,8 @@ jobs:
                 push: true
                 build-args: |
                     ARCHITECTURE=aarch64
-                    ELABFTW_VERSION=$ELAB_BRANCH
-                    S6_OVERLAY_VERSION=$S6V
+                    ELABFTW_VERSION=${{ ELAB_BRANCH }}
+                    S6_OVERLAY_VERSION=${{ S6V }}
                 tags: |
                     ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-arm64
                     ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ steps.elabftw_version.outputs.latest_tag }}-arm64
