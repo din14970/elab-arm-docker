@@ -68,29 +68,29 @@ jobs:
               env:
                   AMDTAG: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-amd64
               run: |
-              docker build -t $AMDTAG --build-arg ARCH=amd64/ ARCHITECTURE=amd64 ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} S6_OVERLAY_VERSION=$S6V .
-              docker push $AMDTAG
+                docker build -t $AMDTAG --build-arg ARCH=amd64/ ARCHITECTURE=amd64 ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} S6_OVERLAY_VERSION=$S6V .
+                docker push $AMDTAG
             
             - name: Build for ARM32V7
               env:
                   ARMTAG: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-arm32v7
               run: |
-              docker build -t $ARMTAG --build-arg ARCH=arm32v7/ ARCHITECTURE=arm ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} S6_OVERLAY_VERSION=$S6V .
-              docker push $ARMTAG
+                docker build -t $ARMTAG --build-arg ARCH=arm32v7/ ARCHITECTURE=arm ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} S6_OVERLAY_VERSION=$S6V .
+                docker push $ARMTAG
 
             - name: Build for ARM64
               env:
                   ARM64TAG: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-arm64
               run: |
-              docker build -t $ARM64TAG --build-arg ARCH=arm64v8/ ARCHITECTURE=aarch64 ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} S6_OVERLAY_VERSION=$S6V .
-              docker push $ARM64TAG
+                docker build -t $ARM64TAG --build-arg ARCH=arm64v8/ ARCHITECTURE=aarch64 ELABFTW_VERSION=${{ steps.elabftw_version.outputs.latest_tag }} S6_OVERLAY_VERSION=$S6V .
+                docker push $ARM64TAG
 
             - name: Create and push the manifest file
               env:
                   PUSHTAG: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:manifest-latest
               run: |
-              docker manifest create $PUSHTAG --ammend $AMDTAG --ammend $ARMTAG --ammend $ARM64TAG
-              docker manifest push $PUSHTAG
+                docker manifest create $PUSHTAG --ammend $AMDTAG --ammend $ARMTAG --ammend $ARM64TAG
+                docker manifest push $PUSHTAG
 
             # https://github.com/docker/build-push-action#multi-platform-image
             #            - name: Build and push to Docker Hub
