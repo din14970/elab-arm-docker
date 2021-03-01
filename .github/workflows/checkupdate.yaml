@@ -1,0 +1,51 @@
+name: Check eLab version
+
+on:
+    # run every day at 1:01
+    schedule:
+    - chron: "01 01 * * *"
+
+jobs:
+    increment-job:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Get latest eLab version
+              id: elabftw_version
+              uses: abatilo/release-info-action@v1.3.0
+              with:
+                  owner: elabftw
+                  repo: elabftw
+
+            - name: Verify release commit elabftw
+              env:
+                  LATEST: ${{ steps.elabftw_version.outputs.latest_tag }}
+                  LATEST_DATE: ${{ steps.elabftw_version.outputs.latest_tag_published_at }}
+                  LATEST_COMMIT: ${{ steps.elabftw_version.outputs.target_commitish }}
+              run: |
+                  echo "eLabFTW: Version $LATEST was released $LATEST_DATE and has commit $LATEST_COMMIT"
+
+            - name: Checkout this repo
+              uses: actions/checkout@v2
+
+            - name: Check latest build, save in env var
+              id: elab_build
+              run: |
+                  cat latest_build >> $GITHUB_ENV
+                  echo ${{ env.ELAB_BUILD }}
+
+            - name: Check if same, else overwrite
+              if: env.ELAB_BUILD == steps.elabftw_version.outputs.latest_tag
+              run: |
+                  echo "ELAB_BUILD=${{ steps.elabftw_version.outputs.latest_tag }}" > latest_build
+
+            - name: Make PR if different
+              if: env.ELAB_BUILD == steps.elabftw_version.outputs.latest_tag
+              id: cpr
+              uses: peter-evans/create-pull-request@v3
+              with:
+                  commit-message: New build
+                  committer: Github <noreply@github.com>
+                  delete-branch: true
+                  branch: update build
+
+
