@@ -3,7 +3,7 @@ name: Check eLab version
 on:
     # run every day at 1:01
     schedule:
-    - chron: "01 01 * * *"
+    - cron: "01 01 * * *"
 
 jobs:
     increment-job:
