@@ -9,7 +9,7 @@ jobs:
         runs-on: ubuntu-latest
         env:
             S6V: 2.2.0.1
-            DOCKER_FILE: Dockerfile_template
+            DOCKER_FILE: Dockerfile
         steps:
             - name: Get latest release commit eLabFTW
               id: elabftw_version
@@ -99,10 +99,10 @@ jobs:
 
             - name: Create and push the manifest file for latest
               run: |
-                docker manifest create ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest --amend ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-amd64 --amend ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-arm32v7 --amend ${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-arm64
+                docker manifest create ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest --amend ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-amd64 --amend ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-arm32 --amend ${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-arm64
                 docker manifest push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest
 
             - name: Create and push the manifest file for version
               run: |
-                docker manifest create ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:{{ steps.elabftw_version.outputs.latest_tag }} --amend ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:{{ steps.elabftw_version.outputs.latest_tag }}-amd64 --amend ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:{{ steps.elabftw_version.outputs.latest_tag }}-arm32v7 --amend ${{ secrets.DOCKER_HUB_REPOSITORY }}:{{ steps.elabftw_version.outputs.latest_tag }}-arm64
+                docker manifest create ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:{{ steps.elabftw_version.outputs.latest_tag }} --amend ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:{{ steps.elabftw_version.outputs.latest_tag }}-amd64 --amend ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:{{ steps.elabftw_version.outputs.latest_tag }}-arm32 --amend ${{ secrets.DOCKER_HUB_REPOSITORY }}:{{ steps.elabftw_version.outputs.latest_tag }}-arm64
                 docker manifest push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:{{ steps.elabftw_version.outputs.latest_tag }}
