@@ -49,6 +49,8 @@ jobs:
 
             # https://github.com/docker/build-push-action#multi-platform-image
             - name: Build AMD64 and push to Docker Hub
+              env:
+                  ELAB_BRANCH: hypernext
               uses: docker/build-push-action@v2
               with:
                 context: .
