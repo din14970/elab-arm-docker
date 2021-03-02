@@ -57,54 +57,11 @@ jobs:
               with:
                 context: .
                 file: ${{ env.DOCKER_FILE }}
-                platforms: linux/amd64
+                platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
                 push: true
                 build-args: |
                     S6_OVERLAY_VERSION=${{ env.S6V }}
                     ELABFTW_VERSION=${{ env.ELAB_BRANCH }}
-                    ARCHITECTURE=amd64
                 tags: |
-                    ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-amd64
-                    ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ steps.elabftw_version.outputs.latest_tag }}-amd64
-
-            - name: Build ARM32 and push to Docker Hub
-              uses: docker/build-push-action@v2
-              with:
-                context: .
-                file: ${{ env.DOCKER_FILE }}
-                platforms: linux/arm/v7
-                push: true
-                build-args: |
-                    S6_OVERLAY_VERSION=${{ env.S6V }}
-                    ELABFTW_VERSION=${{ env.ELAB_BRANCH }}
-                    ARCHITECTURE=arm
-                tags: |
-                    ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-arm32
-                    ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ steps.elabftw_version.outputs.latest_tag }}-arm32
-
-            - name: Build ARM64 and push to Docker Hub
-              uses: docker/build-push-action@v2
-              with:
-                context: .
-                file: ${{ env.DOCKER_FILE }}
-                platforms: linux/arm64/v8
-                push: true
-                build-args: |
-                    S6_OVERLAY_VERSION=${{ env.S6V }}
-                    ELABFTW_VERSION=${{ env.ELAB_BRANCH }}
-                    ARCHITECTURE=aarch64
-                tags: |
-                    ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-arm64
-                    ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ steps.elabftw_version.outputs.latest_tag }}-arm64
-
-            - name: Create and push the manifest file for latest
-              run: |
-                docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_TOKEN }}
-                docker manifest create ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest --amend ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-amd64 --amend ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-arm32 --amend ${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-arm64
-                docker manifest push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest
-
-            - name: Create and push the manifest file for version
-              run: |
-                docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_TOKEN }}
-                docker manifest create ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:{{ steps.elabftw_version.outputs.latest_tag }} --amend ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:{{ steps.elabftw_version.outputs.latest_tag }}-amd64 --amend ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:{{ steps.elabftw_version.outputs.latest_tag }}-arm32 --amend ${{ secrets.DOCKER_HUB_REPOSITORY }}:{{ steps.elabftw_version.outputs.latest_tag }}-arm64
-                docker manifest push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:{{ steps.elabftw_version.outputs.latest_tag }}
+                    ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest
+                    ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ steps.elabftw_version.outputs.latest_tag }}
