@@ -1,51 +1,34 @@
-name: Check eLab version
+name: Check and update latest eLab version every day
 
 on:
     # run every day at 1:01
     schedule:
-    - cron: "01 01 * * *"
+    - cron: "00 10 * * *"
 
 jobs:
+    # adapted from https://stackoverflow.com/questions/58465057/trigger-a-github-action-when-another-repository-creates-a-new-release
     increment-job:
         runs-on: ubuntu-latest
         steps:
-            - name: Get latest eLab version
-              id: elabftw_version
-              uses: abatilo/release-info-action@v1.3.0
-              with:
-                  owner: elabftw
-                  repo: elabftw
-
-            - name: Verify release commit elabftw
-              env:
-                  LATEST: ${{ steps.elabftw_version.outputs.latest_tag }}
-                  LATEST_DATE: ${{ steps.elabftw_version.outputs.latest_tag_published_at }}
-                  LATEST_COMMIT: ${{ steps.elabftw_version.outputs.target_commitish }}
-              run: |
-                  echo "eLabFTW: Version $LATEST was released $LATEST_DATE and has commit $LATEST_COMMIT"
-
             - name: Checkout this repo
               uses: actions/checkout@v2
-
-            - name: Check latest build, save in env var
-              id: elab_build
-              run: |
-                  cat latest_build >> $GITHUB_ENV
-                  echo ${{ env.ELAB_BUILD }}
-
-            - name: Check if same, else overwrite
-              if: env.ELAB_BUILD == steps.elabftw_version.outputs.latest_tag
-              run: |
-                  echo "ELAB_BUILD=${{ steps.elabftw_version.outputs.latest_tag }}" > latest_build
-
-            - name: Make PR if different
-              if: env.ELAB_BUILD == steps.elabftw_version.outputs.latest_tag
-              id: cpr
-              uses: peter-evans/create-pull-request@v3
               with:
-                  commit-message: New build
-                  committer: Github <noreply@github.com>
-                  delete-branch: true
-                  branch: update build
-
-
+                token: ${{ secrets.REPO_TOKEN }}
+              
+            - name: Get release version
+              run: |
+                curl -sL https://api.github.com/repos/elabftw/elabftw/releases/latest | \
+                jq -r ".tag_name" > latest_build
+                
+            - name: check for modified files
+              id: git-check
+              run: echo ::set-output name=modified::$([ -z "`git status --porcelain`" ] && echo "false" || echo "true")
+              
+            - name: Commit latest release version
+              if: steps.git-check.outputs.modified == 'true'
+              run: |
+                git config --global user.name 'din14970'
+                git config --global user.email 'din14970@users.noreply.github.com'
+                git commit -am "New release eLabFTW"
+                git push
+                
