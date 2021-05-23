@@ -3,7 +3,7 @@ name: Check and update latest eLab version every day
 on:
     # run every day at 1:01
     schedule:
-    - cron: "00 10 * * *"
+    - cron: "05 12 * * *"
 
 jobs:
     # adapted from https://stackoverflow.com/questions/58465057/trigger-a-github-action-when-another-repository-creates-a-new-release
