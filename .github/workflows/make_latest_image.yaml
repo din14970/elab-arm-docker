@@ -26,7 +26,7 @@ jobs:
             - name: verify release tags
               run: |
                   echo ${{ steps.elabftwrelease.outputs.releasetag }}
-                  echo ${{ steps.elabftwrelease.outputs.releasetag }}
+                  echo ${{ steps.elabimgrelease.outputs.releasetag }}
                   
             - name: Checkout elabimg repo on latest tag
               uses: actions/checkout@v2
