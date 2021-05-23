@@ -1,9 +1,12 @@
-name: Check and update latest eLab version every day
+name: Check latest eLab version every day and update image
 
 on:
     # run every day at 1:01
     schedule:
-    - cron: "05 12 * * *"
+    - cron: "10 12 * * *"
+    push:
+        branches:
+           - master
 
 jobs:
     # adapted from https://stackoverflow.com/questions/58465057/trigger-a-github-action-when-another-repository-creates-a-new-release
