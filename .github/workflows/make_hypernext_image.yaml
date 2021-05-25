@@ -21,6 +21,10 @@ jobs:
                   repository: "elabftw/elabimg"
                   ref: ${{ env.BRANCHNAME }}
                   
+            - name: Modify the JDK version until openjdk11 is available on armv7
+              run: |
+                sed -i "s/openjdk11-jre/openjdk8-jre/g" Dockerfile
+                  
             # https://github.com/docker/setup-qemu-action#usage
             - name: Set up QEMU
               uses: docker/setup-qemu-action@v1
