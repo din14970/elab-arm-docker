@@ -47,6 +47,7 @@ jobs:
                   sed -i '/ARG S6_OVERLAY_VERSION/aENV S6_OVERLAY_VERSION $S6_OVERLAY_VERSION' Dockerfile
                   sed -i '/RUN tar xzf/iRUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then ARCHITECTURE=arm; elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=amd64; fi && curl -sS -L -O --output-dir /tmp/ --create-dirs "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${ARCHITECTURE}.tar.gz" \\' Dockerfile
                   sed -i 's/RUN tar xzf \/tmp\/s6-overlay-amd64.tar.gz -C \//    && tar xzf "\/tmp\/s6-overlay-${ARCHITECTURE}.tar.gz" -C \//g' Dockerfile
+                  cat Dockerfile
                   
             # https://github.com/docker/setup-qemu-action#usage
             - name: Set up QEMU
