@@ -26,7 +26,7 @@ jobs:
                 sed -i "/ARG TARGETPLATFORM/d" Dockerfile
                 sed -i "/RUN apk upgrade/iARG TARGETPLATFORM" Dockerfile
                 sed -i "s/openjdk11-jre/\$\{OPENJDK\}/g" Dockerfile
-                sed -i "s/RUN apk upgrade/RUN if \[ "\$TARGETPLATFORM" = "linux/arm/v7" \]; then OPENJDK=openjdk8-jre; else OPENJDK=openjdk11-jre; fi && RUN apk upgrade/g"
+                sed -i 's/RUN apk upgrade/RUN if \[ "\$TARGETPLATFORM" = "linux\/arm\/v7" \]; then OPENJDK=openjdk8-jre; else OPENJDK=openjdk11-jre; fi \&\& RUN apk upgrade/g' Dockerfile
                 
             # cypress does not have ARM7 builds
             - name: Add a command in the Dockerfile to remove cypress as a dependency in package.json
