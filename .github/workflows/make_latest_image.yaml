@@ -38,15 +38,15 @@ jobs:
             - name: Modify Dockerfile if necessary
               if: steps.elabftwrelease.outputs.releasetag == '3.6.7'
               run: |
-                  sed -i '/github.com\/just-containers\/s6-overlay/d' Dockerfile &&\
-                  sed -i 's/ENV ELABFTW_VERSION /ARG ELABFTW_VERSION=/' Dockerfile &&\
-                  sed -i '/ARG ELABFTW_VERSION/aENV ELABFTW_VERSION $ELABFTW_VERSION' Dockerfile &&\
-                  sed -i 's/ENV ELABIMG_VERSION /ARG ELABIMG_VERSION=/' Dockerfile &&\
-                  sed -i '/ARG ELABIMG_VERSION/aENV ELABIMG_VERSION $ELABIMG_VERSION' Dockerfile &&\
-                  sed -i 's/ENV S6_OVERLAY_VERSION /ARG S6_OVERLAY_VERSION=/' Dockerfile &&\
-                  sed -i '/ARG S6_OVERLAY_VERSION/aENV S6_OVERLAY_VERSION $S6_OVERLAY_VERSION' Dockerfile &&\
-                  sed -i '/RUN tar xzf/iRUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then ARCHITECTURE=arm; elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=amd64; fi && curl -sS -L -O --output-dir /tmp/ --create-dirs "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${ARCHITECTURE}.tar.gz" \\' Dockerfile &&\
-                  sed -i 's/RUN tar xzf \/tmp\/s6-overlay-amd64.tar.gz -C \//    && tar xzf "/tmp/s6-overlay-${ARCHITECTURE}.tar.gz" -C \/' Dockerfile
+                  sed -i '/github.com\/just-containers\/s6-overlay/d' Dockerfile
+                  sed -i 's/ENV ELABFTW_VERSION /ARG ELABFTW_VERSION=/' Dockerfile
+                  sed -i '/ARG ELABFTW_VERSION/aENV ELABFTW_VERSION $ELABFTW_VERSION' Dockerfile
+                  sed -i 's/ENV ELABIMG_VERSION /ARG ELABIMG_VERSION=/' Dockerfile
+                  sed -i '/ARG ELABIMG_VERSION/aENV ELABIMG_VERSION $ELABIMG_VERSION' Dockerfile
+                  sed -i 's/ENV S6_OVERLAY_VERSION /ARG S6_OVERLAY_VERSION=/' Dockerfile
+                  sed -i '/ARG S6_OVERLAY_VERSION/aENV S6_OVERLAY_VERSION $S6_OVERLAY_VERSION' Dockerfile
+                  sed -i '/RUN tar xzf/iRUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then ARCHITECTURE=arm; elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=amd64; fi && curl -sS -L -O --output-dir /tmp/ --create-dirs "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${ARCHITECTURE}.tar.gz" \\' Dockerfile
+                  sed -i 's/RUN tar xzf \/tmp\/s6-overlay-amd64.tar.gz -C \//    && tar xzf "\/tmp\/s6-overlay-${ARCHITECTURE}.tar.gz" -C \//g' Dockerfile
                   
             # https://github.com/docker/setup-qemu-action#usage
             - name: Set up QEMU
