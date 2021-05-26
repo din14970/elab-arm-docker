@@ -23,12 +23,19 @@ jobs:
                   
             - name: Modify the JDK version until openjdk11 is available on armv7
               run: |
-                sed -i "s/openjdk11-jre/openjdk8-jre/g" Dockerfile
+                sed -i "/ARG TARGETPLATFORM/d" Dockerfile
+                sed -i "/RUN apk upgrade/iARG TARGETPLATFORM" Dockerfile
+                sed -i "s/openjdk11-jre/\$\{OPENJDK\}/g" Dockerfile
+                sed -i "s/RUN apk upgrade/RUN if \[ "\$TARGETPLATFORM" = "linux/arm/v7" \]; then OPENJDK=openjdk8-jre; else OPENJDK=openjdk11-jre; fi && RUN apk upgrade/g"
                 
-            # cypress seems something required for testing but no ARM7 builds
+            # cypress does not have ARM7 builds
             - name: Add a command in the Dockerfile to remove cypress as a dependency in package.json
               run: |
-                sed -i '/WORKDIR \/elabftw/a\\nRUN sed -i "/cypress/d" package.json' Dockerfile
+                sed -i '/WORKDIR \/elabftw/a\\nRUN if \[ "\$TARGETPLATFORM" = "linux/arm/v7" \]; then sed -i "/cypress/d" package.json; fi' Dockerfile
+            
+            - name: View dockerfile
+              run: |
+                cat Dockerfile
                   
             # https://github.com/docker/setup-qemu-action#usage
             - name: Set up QEMU
@@ -51,10 +58,10 @@ jobs:
               with:
                 context: .
                 file: ${{ env.DOCKER_FILE }}
-                platforms: linux/arm/v7
+                platforms: linux/arm/v7,linux/arm64,linux/amd64
                 push: true
                 build-args: |
                     ELABFTW_VERSION=${{ env.BRANCHNAME }}
                     ELABIMG_VERSION=${{ env.BRANCHNAME }}
                 tags: |
-                    ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY_ARM7 }}:${{ env.BRANCHNAME }}
+                    ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ env.BRANCHNAME }}
