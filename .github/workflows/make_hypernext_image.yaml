@@ -28,10 +28,16 @@ jobs:
                 sed -i "s/openjdk11-jre/\$\{OPENJDK\}/g" Dockerfile
                 sed -i 's/RUN apk upgrade/RUN if \[ "\$TARGETPLATFORM" = "linux\/arm\/v7" \]; then OPENJDK=openjdk8-jre; else OPENJDK=openjdk11-jre; fi \&\& apk upgrade/g' Dockerfile
                 
-            # cypress does not have ARM7 builds
+            # cypress does not have ARM7 builds, also dependency issue with ARM64 builds
             - name: Add a command in the Dockerfile to remove cypress as a dependency in package.json
               run: |
-                sed -i '/WORKDIR \/elabftw/a\\nRUN if \[ "\$TARGETPLATFORM" = "linux/arm/v7" \]; then sed -i "/cypress/d" package.json; fi' Dockerfile
+                sed -i '/WORKDIR \/elabftw/a\\nRUN if \[ "\$TARGETPLATFORM" = "linux/arm/v7" \] \|\| \[ "\$TARGETPLATFORM" = "linux\/arm64" \]; then sed -i "/cypress/d" package.json; fi' Dockerfile
+            
+            # Move the symbolic link after the copy commands
+            - name: Buildx move ln command
+              run: |
+                sed -i '/RUN ln -sf /dev/stdout /var/log/nginx/access.log && ln -sf /dev/stderr /var/log/nginx/error.log' DockerFile
+                sed -i '/COPY ./src/services /etc/services.d/aRUN ln -sf /dev/stdout /var/log/nginx/access.log && ln -sf /dev/stderr /var/log/nginx/error.log' Dockerfile
             
             - name: View dockerfile
               run: |
