@@ -61,7 +61,7 @@ jobs:
                 platforms: linux/arm/v7,linux/arm64,linux/amd64
                 push: true
                 build-args: |
-                    ELABFTW_VERSION=${{ env.BRANCHNAME }}
-                    ELABIMG_VERSION=${{ env.BRANCHNAME }}
+                    ELABFTW_VERSION=hypernext
+                    ELABIMG_VERSION=hypernext
                 tags: |
                     ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ env.BRANCHNAME }}
