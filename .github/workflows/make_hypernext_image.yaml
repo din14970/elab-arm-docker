@@ -36,7 +36,7 @@ jobs:
             # Move the symbolic link after the copy commands
             - name: Buildx move ln command
               run: |
-                sed -i '/RUN ln -sf \/dev\/stdout \/var\/log\/nginx\/access.log \&\& ln -sf \/dev\/stderr \/var\/log\/nginx\/error.log/d' DockerFile
+                sed -i '/RUN ln -sf \/dev\/stdout \/var\/log\/nginx\/access.log \&\& ln -sf \/dev\/stderr \/var\/log\/nginx\/error.log/d' Dockerfile
                 sed -i '/COPY \.\/src\/services \/etc\/services\.d/aRUN ln -sf \/dev\/stdout \/var\/log\/nginx\/access.log \&\& ln -sf \/dev\/stderr \/var\/log\/nginx\/error.log' Dockerfile
             
             - name: View dockerfile
