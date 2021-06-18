@@ -12,7 +12,7 @@ jobs:
     buildandpush:
         runs-on: ubuntu-latest
         env:
-            BRANCHNAME: hypernext
+            BRANCHNAME: buildx_fix
             DOCKER_FILE: Dockerfile
         steps:    
             - name: Checkout elabimg repo on latest tag
@@ -32,13 +32,7 @@ jobs:
             - name: Add a command in the Dockerfile to remove cypress as a dependency in package.json
               run: |
                 sed -i '/WORKDIR \/elabftw/a\\nRUN if \[ "\$TARGETPLATFORM" = "linux/arm/v7" \] \|\| \[ "\$TARGETPLATFORM" = "linux\/arm64" \]; then sed -i "/cypress/d" package.json; fi' Dockerfile
-            
-            # Move the symbolic link after the copy commands
-            - name: Buildx move ln command
-              run: |
-                sed -i '/RUN ln -sf \/dev\/stdout \/var\/log\/nginx\/access.log \&\& ln -sf \/dev\/stderr \/var\/log\/nginx\/error.log/d' Dockerfile
-                sed -i '/COPY \.\/src\/services \/etc\/services\.d/aRUN ln -sf \/dev\/stdout \/var\/log\/nginx\/access.log \&\& ln -sf \/dev\/stderr \/var\/log\/nginx\/error.log' Dockerfile
-            
+    
             - name: View dockerfile
               run: |
                 cat Dockerfile
