@@ -12,7 +12,7 @@ jobs:
     buildandpush:
         runs-on: ubuntu-latest
         env:
-            BRANCHNAME: buildx_fix
+            BRANCHNAME: hypernext
             DOCKER_FILE: Dockerfile
         steps:    
             - name: Checkout elabimg repo on latest tag
