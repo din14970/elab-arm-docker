@@ -6,7 +6,7 @@ on:
     - cron: "00 01 * * *"
     push:
         paths:
-          - '.github/workflows/make_hypernext_arm32.yaml'
+          - '.github/workflows/make_hypernext_arm32.yml'
 
 jobs:
     buildandpush:
