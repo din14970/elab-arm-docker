@@ -21,17 +21,10 @@ jobs:
                   repository: "elabftw/elabimg"
                   ref: ${{ env.BRANCHNAME }}
                   
-            - name: Modify the JDK version until openjdk11 is available on armv7
-              run: |
-                sed -i "/ARG TARGETPLATFORM/d" Dockerfile
-                sed -i "/RUN apk upgrade/iARG TARGETPLATFORM" Dockerfile
-                sed -i "s/openjdk11-jre/\$\{OPENJDK\}/g" Dockerfile
-                sed -i 's/RUN apk upgrade/RUN if \[ "\$TARGETPLATFORM" = "linux\/arm\/v7" \]; then OPENJDK=openjdk8-jre; else OPENJDK=openjdk11-jre; fi \&\& apk upgrade/g' Dockerfile
-                
-            # cypress does not have ARM7 builds, also dependency issue with ARM64 builds
+            # cypress does not have ARM builds
             - name: Add a command in the Dockerfile to remove cypress as a dependency in package.json
               run: |
-                sed -i '/WORKDIR \/elabftw/a\\nRUN if \[ "\$TARGETPLATFORM" = "linux/arm/v7" \] \|\| \[ "\$TARGETPLATFORM" = "linux\/arm64" \]; then sed -i "/cypress/d" package.json; fi' Dockerfile
+                sed -i '/WORKDIR \/elabftw/a\\nRUN if \[ "\$TARGETPLATFORM" = "linux\/arm64" \]; then sed -i "/cypress/d" package.json; fi' Dockerfile
     
             - name: View dockerfile
               run: |
@@ -58,7 +51,7 @@ jobs:
               with:
                 context: .
                 file: ${{ env.DOCKER_FILE }}
-                platforms: linux/arm/v7,linux/arm64,linux/amd64
+                platforms: linux/arm64,linux/amd64
                 push: true
                 build-args: |
                     ELABFTW_VERSION=hypernext
