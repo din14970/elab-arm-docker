@@ -1,0 +1,92 @@
+name: Deploy images of new releases to Docker
+
+on:
+    push:
+        paths:
+          # whenever a change happens in this file, a new version is released
+          - 'latest_build'
+          - '.github/workflows/make_latest_arm32.yml'
+
+jobs:
+    buildandpush:
+        runs-on: ubuntu-latest
+        env:
+            DOCKER_FILE: Dockerfile
+        steps:
+            # see https://github.community/t/checkout-with-code-from-the-latest-release/17649
+            - name: get latest release of elabftw with tag
+              id: elabftwrelease
+              run: |
+                  echo "::set-output name=releasetag::$(curl -s https://api.github.com/repos/elabftw/elabftw/releases/latest | jq '.tag_name' | sed 's/\"//g')"
+            
+            - name: get latest release of elabimg with tag
+              id: elabimgrelease
+              run: |
+                  echo "::set-output name=releasetag::$(curl -s https://api.github.com/repos/elabftw/elabimg/releases/latest | jq '.tag_name' | sed 's/\"//g')"
+                  
+            - name: verify release tags
+              run: |
+                  echo ${{ steps.elabftwrelease.outputs.releasetag }}
+                  echo ${{ steps.elabimgrelease.outputs.releasetag }}
+                  
+            - name: Checkout elabimg repo on latest tag
+              uses: actions/checkout@v2
+              with:
+                  repository: "elabftw/elabimg"
+                  ref: ${{ steps.elabimgrelease.outputs.releasetag }}
+                  
+            - name: Modify Dockerfile for v 3.6.7
+              if: steps.elabftwrelease.outputs.releasetag == '3.6.7'
+              run: |
+                  sed -i '/github.com\/just-containers\/s6-overlay/d' Dockerfile
+                  sed -i 's/ENV ELABFTW_VERSION /ARG ELABFTW_VERSION=/' Dockerfile
+                  sed -i '/ARG ELABFTW_VERSION/aENV ELABFTW_VERSION $ELABFTW_VERSION' Dockerfile
+                  sed -i 's/ENV ELABIMG_VERSION /ARG ELABIMG_VERSION=/' Dockerfile
+                  sed -i '/ARG ELABIMG_VERSION/aENV ELABIMG_VERSION $ELABIMG_VERSION' Dockerfile
+                  sed -i 's/ENV S6_OVERLAY_VERSION /ARG S6_OVERLAY_VERSION=/' Dockerfile
+                  sed -i '/ARG S6_OVERLAY_VERSION/aENV S6_OVERLAY_VERSION $S6_OVERLAY_VERSION' Dockerfile
+                  sed -i '/RUN tar xzf/d' Dockerfile
+                  sed -i '/clone elabftw repository in/iARG TARGETPLATFORM' Dockerfile
+                  sed -i '/clone elabftw repository in/iRUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then ARCHITECTURE=arm; elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=amd64; fi && curl -sS -L -O --output-dir /tmp/ --create-dirs "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${ARCHITECTURE}.tar.gz" && tar xzf "/tmp/s6-overlay-${ARCHITECTURE}.tar.gz" -C \/' Dockerfile
+                  
+            - name: Modify Dockerfile for v 4.0.0
+              if: steps.elabftwrelease.outputs.releasetag == '4.0.0'
+              run: |
+                  sed -i '/COPY \.\/src\/nginx\/ \/etc\/nginx\//iRUN rm -r \/etc\/nginx' Dockerfile
+                  sed -i "/ARG TARGETPLATFORM/d" Dockerfile
+                  sed -i "/RUN apk upgrade/iARG TARGETPLATFORM" Dockerfile
+                  sed -i "s/openjdk11-jre/openjdk8-jre/g" Dockerfile
+                  sed -i '/WORKDIR \/elabftw/a\\nRUN if \[ "\$TARGETPLATFORM" = "linux/arm/v7" \]; then sed -i "/cypress/d" package.json; fi' Dockerfile
+      
+            - name: Show Dockerfile
+              run: cat Dockerfile
+      
+            # https://github.com/docker/setup-qemu-action#usage
+            - name: Set up QEMU
+              uses: docker/setup-qemu-action@v1
+
+            # https://github.com/marketplace/actions/docker-setup-buildx
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v1
+
+            # https://github.com/docker/login-action#docker-hub
+            - name: Login to Docker Hub
+              uses: docker/login-action@v1
+              with:
+                username: ${{ secrets.DOCKER_HUB_USERNAME }}
+                password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+            # https://github.com/docker/build-push-action#multi-platform-image
+            - name: Build latest release for all platforms and push to Docker Hub
+              uses: docker/build-push-action@v2
+              with:
+                context: .
+                file: ${{ env.DOCKER_FILE }}
+                platforms: linux/arm/v7
+                push: true
+                build-args: |
+                    ELABFTW_VERSION=${{ steps.elabftwrelease.outputs.releasetag }}
+                    ELABIMG_VERSION=${{ steps.elabimgrelease.outputs.releasetag }}
+                tags: |
+                    ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest-arm32
+                    ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ steps.elabftwrelease.outputs.releasetag }}-arm32
