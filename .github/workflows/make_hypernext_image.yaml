@@ -5,8 +5,8 @@ on:
     schedule:
     - cron: "00 01 * * *"
     push:
-        branches:
-          - master
+        paths:
+          - '.github/workflows/make_hypernext_image.yaml'
 
 jobs:
     buildandpush:
