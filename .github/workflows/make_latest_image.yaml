@@ -58,7 +58,12 @@ jobs:
                   sed -i "s/openjdk11-jre/\$\{OPENJDK\}/g" Dockerfile
                   sed -i 's/RUN apk upgrade/RUN if \[ "\$TARGETPLATFORM" = "linux\/arm\/v7" \]; then OPENJDK=openjdk8-jre; else OPENJDK=openjdk11-jre; fi \&\& apk upgrade/g' Dockerfile
                   sed -i '/WORKDIR \/elabftw/a\\nRUN if \[ "\$TARGETPLATFORM" = "linux/arm/v7" \] \|\| \[ "\$TARGETPLATFORM" = "linux\/arm64" \]; then sed -i "/cypress/d" package.json; fi' Dockerfile
-      
+             
+            - name: Modify Dockerfile for v 4.0.1
+              if: steps.elabftwrelease.outputs.releasetag == '4.0.1'
+              run: |
+                  sed -i '/WORKDIR \/elabftw/a\\nRUN if \[ "\$TARGETPLATFORM" = "linux\/arm64" \]; then sed -i "/cypress/d" package.json; fi' Dockerfile
+            
             - name: Show Dockerfile
               run: cat Dockerfile
       
