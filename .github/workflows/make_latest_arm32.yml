@@ -50,14 +50,22 @@ jobs:
                   sed -i '/clone elabftw repository in/iRUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then ARCHITECTURE=arm; elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=amd64; fi && curl -sS -L -O --output-dir /tmp/ --create-dirs "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${ARCHITECTURE}.tar.gz" && tar xzf "/tmp/s6-overlay-${ARCHITECTURE}.tar.gz" -C \/' Dockerfile
                   
             - name: Modify Dockerfile for v 4.0.0
-              if: steps.elabftwrelease.outputs.releasetag == '4.0.0' || steps.elabftwrelease.outputs.releasetag == '4.0.1'
+              if: steps.elabftwrelease.outputs.releasetag == '4.0.0'
               run: |
                   sed -i '/COPY \.\/src\/nginx\/ \/etc\/nginx\//iRUN rm -r \/etc\/nginx' Dockerfile
                   sed -i "/ARG TARGETPLATFORM/d" Dockerfile
                   sed -i "/RUN apk upgrade/iARG TARGETPLATFORM" Dockerfile
                   sed -i "s/openjdk11-jre/openjdk8-jre/g" Dockerfile
                   sed -i '/WORKDIR \/elabftw/a\\nRUN if \[ "\$TARGETPLATFORM" = "linux/arm/v7" \]; then sed -i "/cypress/d" package.json; fi' Dockerfile
-      
+            
+            - name: Modify Dockerfile for v 4.0.1
+              if: steps.elabftwrelease.outputs.releasetag == '4.0.1'
+              run: |
+                  sed -i "/ARG TARGETPLATFORM/d" Dockerfile
+                  sed -i "/RUN apk upgrade/iARG TARGETPLATFORM" Dockerfile
+                  sed -i "s/openjdk11-jre/openjdk8-jre/g" Dockerfile
+                  sed -i '/WORKDIR \/elabftw/a\\nRUN if \[ "\$TARGETPLATFORM" = "linux/arm/v7" \]; then sed -i "/cypress/d" package.json; fi' Dockerfile
+            
             - name: Show Dockerfile
               run: cat Dockerfile
       
