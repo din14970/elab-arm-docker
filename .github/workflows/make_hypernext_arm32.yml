@@ -1,4 +1,4 @@
-name: Deploy images of hypernext to Docker
+name: Deploy arm32 image of hypernext to Docker
 
 on:
     # run every day at 1:00
